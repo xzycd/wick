@@ -4,7 +4,7 @@ import { cycleFraction } from '../lib/dates'
 import { cadenceLabel, countdownLabel, daysLeft, longDate, money, nextFor } from '../lib/format'
 import { presetById } from '../data/presets'
 import { categoryLabel } from '../data/categories'
-import { Candle } from './Candle'
+import { Candle, heatFor } from './Candle'
 import { Seal } from './Seal'
 
 interface DetailProps {
@@ -15,6 +15,8 @@ interface DetailProps {
   onSetStance: (stance: Stance) => void
   onSnuff: () => void
   onAddToCalendar: () => void
+  /** 'stage' is the desktop pane: no back button, a larger candle beside the facts. */
+  variant?: 'page' | 'stage'
 }
 
 const STANCES: { value: Stance; label: string }[] = [
@@ -31,7 +33,9 @@ export function Detail({
   onSetStance,
   onSnuff,
   onAddToCalendar,
+  variant = 'page',
 }: DetailProps) {
+  const stage = variant === 'stage'
   const days = daysLeft(charge, today)
   const fraction = cycleFraction(charge.anchor, charge.cadence, today, charge.createdAt)
   const next = nextFor(charge, today)
@@ -52,13 +56,17 @@ export function Detail({
   }
 
   return (
-    <div className="screen">
+    <div className={stage ? 'screen detail detail--stage' : 'screen detail'}>
       <header className="topbar">
-        <button className="icon-btn" onClick={onBack} aria-label="Back to the mantel">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M11.5 3.5 6 9l5.5 5.5" />
-          </svg>
-        </button>
+        {stage ? (
+          <span className="label">{charge.isTrial ? 'Trial' : 'On the mantel'}</span>
+        ) : (
+          <button className="icon-btn" onClick={onBack} aria-label="Back to the mantel">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M11.5 3.5 6 9l5.5 5.5" />
+            </svg>
+          </button>
+        )}
         <button className="quiet-btn" onClick={onEdit}>
           Edit
         </button>
@@ -86,8 +94,23 @@ export function Detail({
       </div>
 
       <div className="detail-burn">
-        <Candle fraction={fraction} lit={days >= 0 && days <= 3} size="hero" snuffing={snuffing} />
+        <Candle
+          fraction={fraction}
+          heat={snuffing ? 'high' : heatFor(days, true)}
+          size={stage ? 'stage' : 'hero'}
+          snuffing={snuffing}
+        />
         <div className="detail-burn-text">
+          {stage && days >= 0 && (
+            <span className="numeral">
+              {days === 0 ? 'Today' : (
+                <>
+                  {days}
+                  <em className="numeral-unit">{days === 1 ? 'day' : 'days'}</em>
+                </>
+              )}
+            </span>
+          )}
           <span className={`row-status${days >= 0 && days <= 3 ? ' row-status--low' : ''}`}>
             {countdownLabel(days, charge.isTrial)}
           </span>

@@ -4,7 +4,7 @@
 Wick is a candlelit ledger for money that's about to leave. Every trial and
 subscription is a taper candle: the wax remaining is the time remaining, and
 the one landing soonest carries a small live flame. The whole app feels like a
-warm, quiet room — paper, wax, ink, one ember. It rejects dashboards, cards,
+quiet night room — paper, wax, ink, one ember. It rejects dashboards, cards,
 charts, progress rings, purple gradients, glassmorphism, and anything that
 smells like a SaaS template.
 
@@ -16,18 +16,24 @@ Scale: numeral clamp(64px, 26vw, 104px) · h1 28 · row 16 · caption 13 · labe
 Prices always `font-variant-numeric: tabular-nums`.
 
 ## Color
-Light: base #F5EEE1 (warm bone) · surface #EFE6D4 · ink #2A2118 (espresso) ·
-muted #726552 (same hue as the original #8A7A66 but darkened to clear WCAG AA —
-4.9:1 on base, 4.6:1 on surface — since muted drives 11–14px caption text) ·
-hairline color-mix(ink 14%).
-Dark: base #191410 (candlelit near-black) · surface #221B15 · ink #F0E6D3 ·
-muted #9C8C77.
-ONE accent: ember #C9631F (light) / #E6873B (dark). Ember is the flame — it
-marks urgency and nothing else. Destructive actions use oxide #A03A2A,
-functional only. No pure black/white anywhere. Warm temperature throughout.
+A neutral room so the flame is the only warm thing in it (the old warm-bone
+and espresso browns were dropped on 2026-11-18).
+Light: base #F6F5F2 (soft paper) · surface #EEEDE9 · ink #16171A ·
+muted #66655F (clears WCAG AA on base and surface for 11–14px captions) ·
+hairline color-mix(ink 12%).
+Dark: base #0D0E11 (charcoal night) · surface #15171B · ink #ECE8E1 ·
+muted #8E8B85.
+ONE accent: ember #B85419 (light) / #E8893D (dark). Ember is the flame — it
+marks urgency and nothing else. Candle light in light mode is a pale amber
+(#F3A95C) so glows never read as brown. Destructive actions use oxide,
+functional only. No pure black/white anywhere.
 
 ## Space & shape
-Single column, max 430px, generous side gutter (20px). Rows divided by
+Phone: single column, max 430px (560px from 640px wide). Desktop (1024px+):
+ledger pane on the left (360–420px), a stage on the right holding the open
+charge with a large candle; the add/edit sheet becomes a centered dialog.
+Keyboard: n adds, / searches, ↑/↓ (or j/k) move through the ledger, Esc
+returns home. Phone column: generous side gutter (20px). Rows divided by
 hairlines, never boxed. Vertical rhythm varies: hero is airy, list is snug.
 Spacing scale: 4/8/12/16/24/36/56. Radius system: soft — 14px fields,
 20px sheets, pill buttons/chips. No sharp corners, no mixed radii.
@@ -45,9 +51,15 @@ load, ledger rows rise in with a 40ms stagger while the hero flame lights
 honors prefers-reduced-motion (flame becomes static, rows just appear).
 
 ## Signature move
-The candle countdown: wax height = fraction of billing cycle remaining, a
-live flame on anything landing within 3 days, and the giant Fraunces
-day-numeral beside a tall taper in the hero. Guard it — nothing else may
+The candle countdown: wax height = fraction of billing cycle remaining, and
+the giant Fraunces day-numeral beside a tall taper in the hero. The hero and
+desktop-stage candle always burn: a calm, smaller flame when the charge is
+far off, a taller, quicker one with a wider halo within 3 days. Ledger rows
+stay unlit until 3 days out, so ember in the list still means urgency; the
+selected row is marked in ink, never ember. The
+burning candle has a melt pool, a wax run with a bead that slides now and
+then, and a glowing wick tip; flame motion layers sway and flicker on
+unrelated durations so it never visibly loops. Guard it — nothing else may
 compete for "the memorable thing."
 
 ## Feel (serotonin layer)

@@ -6,7 +6,7 @@ import { totalReclaimedYearly } from '../lib/money'
 import type { DueReminder } from '../lib/notify'
 import { reminderBody } from '../lib/notify'
 import { categoryLabel } from '../data/categories'
-import { Candle } from './Candle'
+import { Candle, heatFor } from './Candle'
 import { Empty } from './Empty'
 
 interface HomeProps {
@@ -22,12 +22,15 @@ interface HomeProps {
   onToggleTheme: () => void
   permissionNudge: boolean
   onAllowReminders: () => void
+  /** Desktop: the hero lives on the stage, and the list marks what's open there. */
+  wide?: boolean
+  selectedId?: string
 }
 
 type Sort = 'soonest' | 'priciest' | 'name'
 
 export function Home(props: HomeProps) {
-  const { charges, today, onOpen } = props
+  const { charges, today, onOpen, wide = false, selectedId } = props
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category | 'all'>('all')
   const [sort, setSort] = useState<Sort>('soonest')
@@ -62,8 +65,8 @@ export function Home(props: HomeProps) {
   const sorted = [...charges].sort(bySoonest)
   const upcoming = sorted.filter((c) => daysLeft(c, today) >= 0)
   const ended = sorted.filter((c) => daysLeft(c, today) < 0)
-  const hero = upcoming[0]
-  const rest = upcoming.slice(1)
+  const hero = wide ? undefined : upcoming[0]
+  const rest = wide ? upcoming : upcoming.slice(1)
   const undecided = rest.filter((c) => c.stance === 'undecided' && daysLeft(c, today) <= 14)
   const comingUp = rest.filter((c) => !undecided.includes(c))
 
@@ -150,7 +153,7 @@ export function Home(props: HomeProps) {
                   {filtered.length} {filtered.length === 1 ? 'charge' : 'charges'}
                 </h2>
                 {filtered.map((c, i) => (
-                  <Row key={c.id} charge={c} today={today} onOpen={onOpen} index={i} />
+                  <Row key={c.id} charge={c} today={today} onOpen={onOpen} index={i} selected={c.id === selectedId} />
                 ))}
               </section>
             )
@@ -166,13 +169,13 @@ export function Home(props: HomeProps) {
               )}
 
               {undecided.length > 0 && (
-                <Section label="Needs a decision" charges={undecided} today={today} onOpen={onOpen} />
+                <Section label="Needs a decision" charges={undecided} today={today} onOpen={onOpen} selectedId={selectedId} />
               )}
               {comingUp.length > 0 && (
-                <Section label="On the mantel" charges={comingUp} today={today} onOpen={onOpen} />
+                <Section label="On the mantel" charges={comingUp} today={today} onOpen={onOpen} selectedId={selectedId} />
               )}
               {ended.length > 0 && (
-                <Section label="Already ended" charges={ended} today={today} onOpen={onOpen} dim />
+                <Section label="Already ended" charges={ended} today={today} onOpen={onOpen} selectedId={selectedId} dim />
               )}
 
               {reclaimedYearly > 0 && (
@@ -231,7 +234,7 @@ function Hero({ charge, today, onOpen }: { charge: Charge; today: string; onOpen
           <span className="hero-undecided">You haven't decided on this one yet</span>
         )}
       </div>
-      <Candle fraction={fraction} lit={days <= 3} size="hero" />
+      <Candle fraction={fraction} heat={heatFor(days, true)} size="hero" />
     </button>
   )
 }
@@ -241,19 +244,21 @@ function Section({
   charges,
   today,
   onOpen,
+  selectedId,
   dim,
 }: {
   label: string
   charges: Charge[]
   today: string
   onOpen: (id: string) => void
+  selectedId?: string
   dim?: boolean
 }) {
   return (
     <section className={dim ? 'rows rows--dim' : 'rows'}>
       <h2 className="label section-label">{label}</h2>
       {charges.map((c, i) => (
-        <Row key={c.id} charge={c} today={today} onOpen={onOpen} index={i} />
+        <Row key={c.id} charge={c} today={today} onOpen={onOpen} index={i} selected={c.id === selectedId} />
       ))}
     </section>
   )
@@ -264,21 +269,25 @@ function Row({
   today,
   onOpen,
   index,
+  selected = false,
 }: {
   charge: Charge
   today: string
   onOpen: (id: string) => void
   index: number
+  selected?: boolean
 }) {
   const days = daysLeft(charge, today)
   const fraction = cycleFraction(charge.anchor, charge.cadence, today, charge.createdAt)
   return (
     <button
-      className="row"
+      className={selected ? 'row row--on' : 'row'}
+      data-id={charge.id}
+      aria-current={selected ? 'true' : undefined}
       style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
       onClick={() => onOpen(charge.id)}
     >
-      <Candle fraction={fraction} lit={days >= 0 && days <= 3} size="row" />
+      <Candle fraction={fraction} heat={heatFor(days, false)} size="row" />
       <span className="row-main">
         <span className="row-name">{charge.name}</span>
         <span className={`row-status${days >= 0 && days <= 3 ? ' row-status--low' : ''}`}>

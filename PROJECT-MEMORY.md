@@ -174,6 +174,16 @@ Ordered by impact-to-effort. None require abandoning the privacy stance.
 
 ## Changelog
 
+- **2026-11-18 (later)** — **Portfolio polish, then re-frozen.** Opened only as a showcase, with no
+  business features. The hero and stage candle now always burn (calm far off, taller within 3 days),
+  with a melt pool, a sliding wax bead, a glowing wick and layered sway/flicker. From 1024px wide
+  the layout splits: ledger on the left, the open charge on a stage with a large candle on the right,
+  and add/edit as a centered dialog. Keyboard: n, /, ↑/↓ or j/k, Esc. The brown palette was replaced
+  with neutral paper (light) and charcoal (dark) so the flame is the only warm colour. The banner was
+  rebuilt with the "i" as a wax taper. The repo was deleted and recreated to purge old PR refs.
+  An adversarial review confirmed 8 findings (2 duplicates); all were fixed and checked in the browser.
+  54/54 tests pass. Freeze rules apply again.
+
 - **2026-11-18** — **Frozen (legacy mode).** Market re-check: iOS 27 Wallet added a free
   Recurring view (Apple Card only), Rocket Money gives tracking away free and sells a $15/mo
   Premium+ tier, the no-bank niche now has 10+ trackers including a free PWA (SubTracker), and
