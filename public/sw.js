@@ -1,15 +1,16 @@
 // Wick service worker — makes the app installable and fully offline.
 //
 // Strategy, by request type (all same-origin; the app has no backend):
-//   • /assets/*  → cache-first. Vite content-hashes these, so a given URL is
+//   • assets/*   → cache-first. Vite content-hashes these, so a given URL is
 //                  immutable; once cached it never needs the network again.
 //   • navigations → network-first for freshness, falling back to the cached
 //                   app shell when offline.
 //   • everything else (icons, manifest) → stale-while-revalidate.
 // The shell is precached on install so a cold offline launch still renders.
 
-const CACHE = 'wick-v2'
-const SHELL = ['/', '/flame.svg', '/manifest.webmanifest']
+const CACHE = 'wick-v3'
+const BASE = new URL('./', self.location).pathname
+const SHELL = [BASE, BASE + 'flame.svg', BASE + 'manifest.webmanifest']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -37,7 +38,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
 
-  if (url.pathname.startsWith('/assets/')) {
+  if (url.pathname.startsWith(BASE + 'assets/')) {
     event.respondWith(cacheFirst(req))
   } else if (req.mode === 'navigate') {
     event.respondWith(networkFirstNav(req))
@@ -59,10 +60,10 @@ async function networkFirstNav(req) {
   const cache = await caches.open(CACHE)
   try {
     const fresh = await fetch(req)
-    cache.put('/', fresh.clone())
+    cache.put(BASE, fresh.clone())
     return fresh
   } catch {
-    return (await cache.match(req)) || (await cache.match('/')) || Response.error()
+    return (await cache.match(req)) || (await cache.match(BASE)) || Response.error()
   }
 }
 
