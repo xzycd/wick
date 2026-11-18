@@ -7,6 +7,8 @@ left, and anything due within three days burns with a small flame.
 There are no accounts, no backend, no sync, no analytics and no bank linking.
 Your data stays in your browser's local storage.
 
+> Live at https://xzycd.github.io/wick/
+>
 > Frozen in November 2026. Wick is finished and works, but it gets security
 > fixes only, no new features.
 

@@ -56,7 +56,7 @@ export async function requestPermission(): Promise<NotificationPermission | 'uns
 export function fireSystemNotification(r: DueReminder): boolean {
   if (!canNotify() || Notification.permission !== 'granted') return false
   try {
-    new Notification('Wick', { body: reminderBody(r), icon: '/flame.svg', tag: r.charge.id })
+    new Notification('Wick', { body: reminderBody(r), icon: `${import.meta.env.BASE_URL}flame.svg`, tag: r.charge.id })
     return true
   } catch {
     return false
