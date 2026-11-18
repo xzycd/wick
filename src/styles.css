@@ -114,7 +114,14 @@ body::after {
 }
 
 .wordmark-ember {
+  display: inline-block;
   color: var(--ember);
+  animation: coal 4.2s ease-in-out infinite;
+}
+
+@keyframes coal {
+  0%, 100% { text-shadow: 0 0 0 transparent; }
+  50% { text-shadow: 0 0 10px color-mix(in oklab, var(--ember) 70%, transparent); }
 }
 
 /* ——— top bar ——— */
@@ -271,12 +278,19 @@ body::after {
   transition: background 160ms var(--ease);
 }
 
-.row:hover {
-  background: color-mix(in oklab, var(--surface) 55%, transparent);
+@media (hover: hover) {
+  .row:hover {
+    background: color-mix(in oklab, var(--surface) 55%, transparent);
+  }
 }
 
 .row:active {
   transform: translateY(1px);
+}
+
+.row--on {
+  background: var(--surface);
+  box-shadow: inset 2px 0 0 var(--ember);
 }
 
 @keyframes row-in {
@@ -332,8 +346,20 @@ body::after {
 
 /* ——— candle ——— */
 
+.candle {
+  overflow: visible;
+}
+
 .candle-ghost {
   fill: var(--surface-deep);
+}
+
+.candle--hero .candle-ghost,
+.candle--stage .candle-ghost {
+  fill: none;
+  stroke: var(--hairline);
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
 }
 
 .candle-wax {
@@ -357,13 +383,29 @@ body::after {
   opacity: 0.75;
 }
 
+.candle--stage .candle-wick {
+  stroke-width: 2.4;
+}
+
 .flame-outer {
   fill: var(--ember);
 }
 
 .flame-core {
-  fill: #f7e8c8;
+  fill: #fbecd0;
 }
+
+.flame-root {
+  fill: #5a6f9a;
+  opacity: 0.35;
+}
+
+.fire-stop-base { stop-color: #b4541a; }
+.fire-stop-mid { stop-color: var(--ember); }
+.fire-stop-tip { stop-color: #f6c27a; }
+.halo-stop-in { stop-color: var(--ember); stop-opacity: 0.3; }
+.halo-stop-out { stop-color: var(--ember); stop-opacity: 0; }
+[data-theme='dark'] .halo-stop-in { stop-opacity: 0.42; }
 
 .flame-glow {
   fill: var(--ember);
@@ -371,13 +413,83 @@ body::after {
   filter: blur(4px);
 }
 
-.candle--lit .candle-flame {
-  animation: flame-light 700ms var(--ease) backwards, flicker 3s ease-in-out 700ms infinite;
+.candle-pool {
+  fill: color-mix(in oklab, var(--wax) 70%, var(--ember));
+  opacity: 0.55;
+}
+
+.candle-drip {
+  fill: none;
+  stroke: var(--wax-edge);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.candle--stage .candle-drip {
+  stroke-width: 2.4;
+}
+
+.candle-bead {
+  fill: var(--wax);
+  stroke: var(--wax-edge);
+  stroke-width: 0.8;
+  opacity: 0;
+}
+
+.wick-ember {
+  fill: #f6c27a;
+}
+
+/* Calm flames sway; urgent ones burn taller and quicker. Durations are
+   deliberately unrelated so the motion never visibly repeats. */
+.candle-flame {
+  animation: flame-light 700ms var(--ease) backwards;
+}
+
+.flame-sway {
+  animation: sway 4.3s ease-in-out 700ms infinite, flicker 1.9s ease-in-out 700ms infinite;
+}
+
+.flame-core {
+  animation: flicker 2.3s ease-in-out 700ms infinite reverse;
+}
+
+.candle--high .flame-sway {
+  animation-duration: 3.1s, 1.3s;
+}
+
+.candle-halo {
+  animation: halo 3.7s ease-in-out infinite;
+}
+
+.candle--high .candle-halo {
+  animation-duration: 2.4s;
+}
+
+.candle--low .candle-halo {
+  opacity: 0.7;
+}
+
+.candle-pool {
+  animation: halo 2.9s ease-in-out infinite;
+}
+
+.candle-bead {
+  animation: bead 11s ease-in 3s infinite;
+}
+
+.wick-ember {
+  animation: halo 1.7s ease-in-out infinite;
 }
 
 /* snuff: flame gutters out, a wisp of smoke rises and dissolves */
 .candle--snuffing .candle-flame {
   animation: flame-out 220ms var(--ease) forwards;
+}
+
+.candle--snuffing .candle-halo {
+  animation: fade-out 400ms var(--ease) forwards;
 }
 
 .candle-smoke {
@@ -395,6 +507,10 @@ body::after {
   }
 }
 
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+
 @keyframes smoke-rise {
   0% { opacity: 0; transform: translateY(2px) scale(0.9); }
   25% { opacity: 0.55; }
@@ -407,10 +523,36 @@ body::after {
 }
 
 @keyframes flicker {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  22% { transform: scale(0.96, 1.04) rotate(-1.6deg); }
-  48% { transform: scale(1.03, 0.97) rotate(1.2deg); }
-  74% { transform: scale(0.97, 1.02) rotate(-0.8deg); }
+  0%, 100% { transform: scale(1, 1); }
+  17% { transform: scale(0.95, 1.06); }
+  39% { transform: scale(1.03, 0.96); }
+  61% { transform: scale(0.97, 1.08); }
+  83% { transform: scale(1.02, 0.98); }
+}
+
+@keyframes sway {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -2.5deg; }
+  50% { rotate: 1.5deg; }
+  75% { rotate: -1deg; }
+}
+
+@keyframes halo {
+  0%, 100% { opacity: 1; }
+  30% { opacity: 0.78; }
+  55% { opacity: 0.94; }
+  80% { opacity: 0.72; }
+}
+
+@keyframes bead {
+  0%, 70% { opacity: 0; transform: translateY(0); }
+  74% { opacity: 1; }
+  96% { opacity: 1; transform: translateY(var(--bead-run, 22px)); }
+  100% { opacity: 0; transform: translateY(var(--bead-run, 22px)); }
+}
+
+.candle--stage .candle-bead {
+  --bead-run: 34px;
 }
 
 /* ——— seals ——— */
@@ -781,6 +923,10 @@ body::after {
 @keyframes sheet-up {
   from { transform: translateY(48px); opacity: 0.4; }
   to { transform: none; opacity: 1; }
+}
+
+.sheet:focus-visible {
+  outline: none;
 }
 
 .sheet-handle {
@@ -1324,6 +1470,177 @@ textarea {
   color: var(--muted);
 }
 
+
+/* ——— tablet: one roomier column ——— */
+
+@media (min-width: 640px) {
+  .app {
+    max-width: 560px;
+  }
+
+  .screen {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .chips--scroll {
+    margin-left: -32px;
+    margin-right: -32px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .numeral {
+    font-size: 112px;
+  }
+}
+
+/* ——— desktop: ledger on the left, the burning candle on a stage ——— */
+
+@media (min-width: 1024px) {
+  .app--split {
+    display: grid;
+    grid-template-columns: minmax(360px, 420px) 1fr;
+    max-width: 1280px;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .pane {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--hairline) transparent;
+  }
+
+  .pane--list {
+    border-right: 1px solid var(--hairline);
+  }
+
+  .pane--list .screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 22px 28px 0;
+    animation: none;
+  }
+
+  .pane--list .chips--scroll {
+    margin-left: -28px;
+    margin-right: -28px;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .pane--list .rows:first-of-type {
+    margin-top: 18px;
+  }
+
+  .pane--list .row {
+    padding-left: 12px;
+    padding-right: 10px;
+    border-radius: 12px;
+    border-bottom-color: transparent;
+    margin-bottom: 2px;
+  }
+
+  .pane--list .dock {
+    position: sticky;
+    left: auto;
+    right: auto;
+    bottom: 0;
+    margin: auto -28px 0;
+    padding: 18px 28px 22px;
+  }
+
+  .pane--list .dock .pill {
+    width: 100%;
+  }
+
+  .pane--stage {
+    position: relative;
+    background:
+      radial-gradient(60% 55% at 70% 38%, color-mix(in oklab, var(--ember) 9%, transparent), transparent 70%),
+      var(--base);
+  }
+
+  .pane--stage .screen {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 56px 72px;
+  }
+
+  .detail--stage .detail-head {
+    padding-top: 30px;
+  }
+
+  .detail--stage .detail-name {
+    font-size: 44px;
+    letter-spacing: -0.02em;
+  }
+
+  .detail--stage .detail-price {
+    font-size: 26px;
+  }
+
+  .detail--stage .detail-burn {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 30px 4px 34px;
+  }
+
+  .detail--stage .detail-burn-text {
+    padding-bottom: 14px;
+  }
+
+  .detail--stage .numeral {
+    font-size: 132px;
+    margin: 0 0 14px;
+  }
+
+  .detail--stage .detail-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px 18px;
+  }
+
+  .detail--stage .detail-actions .pill {
+    width: auto;
+  }
+
+  .detail--stage .seg {
+    max-width: 440px;
+  }
+
+  /* the add/edit sheet becomes a centered dialog */
+  .backdrop {
+    align-items: center;
+  }
+
+  .sheet {
+    width: min(520px, calc(100vw - 48px));
+    max-height: 86dvh;
+    border-radius: var(--radius-sheet);
+    padding: 26px 30px 28px;
+    animation: dialog-in 280ms var(--ease);
+  }
+
+  .sheet-handle {
+    display: none;
+  }
+
+  .toast {
+    bottom: 32px;
+  }
+}
+
+@keyframes dialog-in {
+  from { transform: translateY(12px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
 /* ——— reduced motion ——— */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1335,7 +1652,17 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 
-  .candle--lit .candle-flame {
-    animation: none;
+  .candle-flame,
+  .flame-sway,
+  .flame-core,
+  .candle-halo,
+  .candle-pool,
+  .wick-ember,
+  .wordmark-ember {
+    animation: none !important;
+  }
+
+  .candle-bead {
+    display: none;
   }
 }

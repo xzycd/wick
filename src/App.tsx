@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Charge, CurrencyCode, Reclaimed, Settings, Stance } from './types'
 import { todayISO } from './lib/dates'
+import { daysLeft } from './lib/format'
 import { cadencePerYear, money, setDisplayCurrency } from './lib/format'
 import {
   dueReminders,
@@ -32,6 +33,19 @@ import { Settings as SettingsScreen } from './components/Settings'
 
 type View = { name: 'home' } | { name: 'detail'; id: string } | { name: 'settings' }
 
+const WIDE_QUERY = '(min-width: 1024px)'
+
+function useWide() {
+  const [wide, setWide] = useState(() => typeof matchMedia !== 'undefined' && matchMedia(WIDE_QUERY).matches)
+  useEffect(() => {
+    const mq = matchMedia(WIDE_QUERY)
+    const onChange = () => setWide(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return wide
+}
+
 export default function App() {
   const [today, setToday] = useState(todayISO)
   const [charges, setCharges] = useState<Charge[]>(loadCharges)
@@ -42,6 +56,7 @@ export default function App() {
   const [toast, setToast] = useState<{ msg: string; undo?: () => void } | null>(null)
   const [banner, setBanner] = useState<DueReminder[]>([])
   const [permission, setPermission] = useState(notificationPermission())
+  const wide = useWide()
 
   // Keep the display-currency singleton in sync before children paint. useMemo
   // runs during render (so money() is correct on the first paint), but only
@@ -205,55 +220,130 @@ export default function App() {
   const detailCharge =
     view.name === 'detail' ? charges.find((c) => c.id === view.id) : undefined
 
+  // On desktop the stage always holds a charge: the one opened, else the next to land.
+  const stageCharge =
+    detailCharge ??
+    (wide && view.name === 'home'
+      ? [...charges].sort((a, b) => {
+          const da = daysLeft(a, today)
+          const db = daysLeft(b, today)
+          return (da < 0 ? 1 : 0) - (db < 0 ? 1 : 0) || da - db
+        })[0]
+      : undefined)
+
+  const editingRef = useRef(editing)
+  editingRef.current = editing
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (editingRef.current !== null || e.metaKey || e.ctrlKey || e.altKey) return
+      const typing =
+        e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable]')
+      if (e.key === 'Escape' && !typing) {
+        setView({ name: 'home' })
+        return
+      }
+      if (typing) return
+      if (e.key === 'n') {
+        e.preventDefault()
+        setEditing('new')
+      } else if (e.key === '/') {
+        const search = document.querySelector<HTMLInputElement>('.search input')
+        if (search) {
+          e.preventDefault()
+          search.focus()
+        }
+      } else if (wide && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'j' || e.key === 'k')) {
+        const rows = [...document.querySelectorAll<HTMLButtonElement>('.pane--list .row')]
+        if (rows.length === 0) return
+        e.preventDefault()
+        const at = rows.findIndex((r) => r.getAttribute('aria-current') === 'true')
+        const step = e.key === 'ArrowDown' || e.key === 'j' ? 1 : -1
+        const next = rows[Math.min(rows.length - 1, Math.max(0, at + step))]
+        next.focus()
+        const id = next.dataset.id
+        if (id) setView({ name: 'detail', id })
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [wide])
+
+  const settingsScreen = (
+    <SettingsScreen
+      settings={settings}
+      reclaimed={reclaimed}
+      charges={charges}
+      permission={permission}
+      onBack={() => setView({ name: 'home' })}
+      onSetTheme={(theme) => setSettings((s) => ({ ...s, theme }))}
+      onSetCurrency={(currency: CurrencyCode) => setSettings((s) => ({ ...s, currency }))}
+      onAllowReminders={allowReminders}
+      onExportAllCalendar={exportAllCalendar}
+      onBackup={backup}
+      onRestore={restore}
+      onClearAll={eraseEverything}
+    />
+  )
+
+  const detailScreen = (charge: Charge, variant: 'page' | 'stage') => (
+    <Detail
+      key={charge.id}
+      charge={charge}
+      today={today}
+      variant={variant}
+      onBack={() => setView({ name: 'home' })}
+      onEdit={() => setEditing(charge)}
+      onSetStance={(stance) => setStance(charge.id, stance)}
+      onSnuff={() => snuff(charge.id)}
+      onAddToCalendar={() => addToCalendar(charge)}
+    />
+  )
+
+  const homeScreen = (
+    <Home
+      charges={charges}
+      reclaimed={reclaimed}
+      today={today}
+      reminders={banner}
+      wide={wide}
+      selectedId={wide && view.name !== 'settings' ? stageCharge?.id : undefined}
+      onOpen={(id) => {
+        setBanner([])
+        setView({ name: 'detail', id })
+      }}
+      onAdd={() => setEditing('new')}
+      onSeed={() => setCharges(exampleCharges(today))}
+      onOpenSettings={() => setView({ name: 'settings' })}
+      themeLabel={resolvedTheme === 'dark' ? 'light' : 'dark'}
+      onToggleTheme={() =>
+        setSettings((s) => ({ ...s, theme: resolvedTheme === 'dark' ? 'light' : 'dark' }))
+      }
+      permissionNudge={
+        permission === 'default' && charges.some((c) => c.remindDaysBefore !== null)
+      }
+      onAllowReminders={allowReminders}
+    />
+  )
+
+  const split = wide && charges.length > 0
+
   return (
-    <div className="app">
-      {view.name === 'settings' ? (
-        <SettingsScreen
-          settings={settings}
-          reclaimed={reclaimed}
-          charges={charges}
-          permission={permission}
-          onBack={() => setView({ name: 'home' })}
-          onSetTheme={(theme) => setSettings((s) => ({ ...s, theme }))}
-          onSetCurrency={(currency: CurrencyCode) => setSettings((s) => ({ ...s, currency }))}
-          onAllowReminders={allowReminders}
-          onExportAllCalendar={exportAllCalendar}
-          onBackup={backup}
-          onRestore={restore}
-          onClearAll={eraseEverything}
-        />
-      ) : view.name === 'detail' && detailCharge ? (
-        <Detail
-          charge={detailCharge}
-          today={today}
-          onBack={() => setView({ name: 'home' })}
-          onEdit={() => setEditing(detailCharge)}
-          onSetStance={(stance) => setStance(detailCharge.id, stance)}
-          onSnuff={() => snuff(detailCharge.id)}
-          onAddToCalendar={() => addToCalendar(detailCharge)}
-        />
+    <div className={split ? 'app app--split' : 'app'}>
+      {split ? (
+        <>
+          <aside className="pane pane--list">{homeScreen}</aside>
+          <main className="pane pane--stage">
+            {view.name === 'settings'
+              ? settingsScreen
+              : stageCharge && detailScreen(stageCharge, 'stage')}
+          </main>
+        </>
+      ) : view.name === 'settings' ? (
+        settingsScreen
+      ) : detailCharge ? (
+        detailScreen(detailCharge, 'page')
       ) : (
-        <Home
-          charges={charges}
-          reclaimed={reclaimed}
-          today={today}
-          reminders={banner}
-          onOpen={(id) => {
-            setBanner([])
-            setView({ name: 'detail', id })
-          }}
-          onAdd={() => setEditing('new')}
-          onSeed={() => setCharges(exampleCharges(today))}
-          onOpenSettings={() => setView({ name: 'settings' })}
-          themeLabel={resolvedTheme === 'dark' ? 'light' : 'dark'}
-          onToggleTheme={() =>
-            setSettings((s) => ({ ...s, theme: resolvedTheme === 'dark' ? 'light' : 'dark' }))
-          }
-          permissionNudge={
-            permission === 'default' && charges.some((c) => c.remindDaysBefore !== null)
-          }
-          onAllowReminders={allowReminders}
-        />
+        homeScreen
       )}
 
       {editing !== null && (
