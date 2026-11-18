@@ -1,0 +1,91 @@
+# DESIGN DNA — Wick
+
+## North star
+Wick is a candlelit ledger for money that's about to leave. Every trial and
+subscription is a taper candle: the wax remaining is the time remaining, and
+the one landing soonest carries a small live flame. The whole app feels like a
+warm, quiet room — paper, wax, ink, one ember. It rejects dashboards, cards,
+charts, progress rings, purple gradients, glassmorphism, and anything that
+smells like a SaaS template.
+
+## Typography
+Display: Fraunces (variable, optical sizing) — 500–640 weight, tight tracking
+on the giant countdown numeral; real italics for asides ("days", "then").
+Body: Karla — 400/500/700, 15–16px, line-height 1.5, tracked caps for labels.
+Scale: numeral clamp(64px, 26vw, 104px) · h1 28 · row 16 · caption 13 · label 11 caps +0.12em.
+Prices always `font-variant-numeric: tabular-nums`.
+
+## Color
+Light: base #F5EEE1 (warm bone) · surface #EFE6D4 · ink #2A2118 (espresso) ·
+muted #726552 (same hue as the original #8A7A66 but darkened to clear WCAG AA —
+4.9:1 on base, 4.6:1 on surface — since muted drives 11–14px caption text) ·
+hairline color-mix(ink 14%).
+Dark: base #191410 (candlelit near-black) · surface #221B15 · ink #F0E6D3 ·
+muted #9C8C77.
+ONE accent: ember #C9631F (light) / #E6873B (dark). Ember is the flame — it
+marks urgency and nothing else. Destructive actions use oxide #A03A2A,
+functional only. No pure black/white anywhere. Warm temperature throughout.
+
+## Space & shape
+Single column, max 430px, generous side gutter (20px). Rows divided by
+hairlines, never boxed. Vertical rhythm varies: hero is airy, list is snug.
+Spacing scale: 4/8/12/16/24/36/56. Radius system: soft — 14px fields,
+20px sheets, pill buttons/chips. No sharp corners, no mixed radii.
+
+## Materials & atmosphere
+Paper grain: faint SVG turbulence overlay on the base (2–3% opacity).
+Wax: candle gauges get a soft inner highlight, like a dipped taper.
+Shadows: warm-tinted (ink at low alpha), only on the floating sheet and flame
+glow. No gray drop shadows, no blur-glass.
+
+## Motion
+Ease: cubic-bezier(.32,.72,.28,1), 240–420ms. ONE orchestrated moment: on
+load, ledger rows rise in with a 40ms stagger while the hero flame lights
+(scale from 0 at the wick). Flame idles with a 3s flicker loop. Everything
+honors prefers-reduced-motion (flame becomes static, rows just appear).
+
+## Signature move
+The candle countdown: wax height = fraction of billing cycle remaining, a
+live flame on anything landing within 3 days, and the giant Fraunces
+day-numeral beside a tall taper in the hero. Guard it — nothing else may
+compete for "the memorable thing."
+
+## Feel (serotonin layer)
+This is a serotonin-lean context: calm, reassuring, zero gimmicks. NO
+confetti, count-ups, or celebratory sound — they'd fail the 50th-visit test.
+Rules: every interactive element gives feedback ≤150ms (press = scale
+0.9–0.98 with a gentle spring, --ease-spring); one earned reward only — the
+candle guttering out with a rising smoke wisp when a charge is snuffed;
+snuffing is undoable (7s toast) because deleting money data is irreversible;
+a single light haptic on primary actions (add, snuff, decide). All motion
+sits behind prefers-reduced-motion; the snuff skips straight to deletion when
+motion is reduced. Only transform/opacity/color are animated.
+
+## Voice
+Calm, warm, a little literary; candle-flavored but never cutesy. "Burning
+low", "Lands today", "The mantel is clear." When something is canceled:
+"Snuffed. That's $11.99 a month back." No exclamation marks, no "Elevate/
+Seamless/Supercharge", no finance-bro copy.
+
+## Reward (dopamine layer — honest only)
+Finance context = minimal push, trust over arousal. The ONE honest reward is
+Reclaimed: real annualized money you've stopped paying, shown as a big ember
+Fraunces figure that tallies up on the Settings screen (respects reduced
+motion). No fake scarcity, no fake countdowns (the renewal dates are real),
+no confirmshaming, no streak-shaming. The candle countdown stays the single
+signature; Reclaimed is a secondary, quieter reward the user seeks out.
+
+## Feature surface (v1.1)
+Reclaimed savings ledger · calendar (.ics) export per-charge and all — the
+reliable no-backend reminder · JSON backup/restore · multi-currency · search
++ sort + category filters (appear past 4 charges) · offline PWA service
+worker · Settings screen. Core logic (dates, money, ics, backup) is pure and
+unit-tested.
+
+## Banned in this project
+The discarded autopilot: white screen, purple accents, rounded subscription
+cards with progress rings, Inter, floating "+" FAB, total-spend dashboard.
+Also banned: charts, rings/donuts, badges in traffic-light colors, gradient
+buttons, glass panels, confetti, Inter/Roboto/Arial/Helvetica/system-ui/
+Space Grotesk, more than one accent color, fake official brand logos
+(service marks are original wax-seal monograms only).
