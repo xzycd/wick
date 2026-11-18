@@ -27,7 +27,11 @@ marks urgency and nothing else. Destructive actions use oxide #A03A2A,
 functional only. No pure black/white anywhere. Warm temperature throughout.
 
 ## Space & shape
-Single column, max 430px, generous side gutter (20px). Rows divided by
+Phone: single column, max 430px (560px from 640px wide). Desktop (1024px+):
+ledger pane on the left (360–420px), a stage on the right holding the open
+charge with a large candle; the add/edit sheet becomes a centered dialog.
+Keyboard: n adds, / searches, ↑/↓ (or j/k) move through the ledger, Esc
+returns home. Phone column: generous side gutter (20px). Rows divided by
 hairlines, never boxed. Vertical rhythm varies: hero is airy, list is snug.
 Spacing scale: 4/8/12/16/24/36/56. Radius system: soft — 14px fields,
 20px sheets, pill buttons/chips. No sharp corners, no mixed radii.
@@ -45,9 +49,14 @@ load, ledger rows rise in with a 40ms stagger while the hero flame lights
 honors prefers-reduced-motion (flame becomes static, rows just appear).
 
 ## Signature move
-The candle countdown: wax height = fraction of billing cycle remaining, a
-live flame on anything landing within 3 days, and the giant Fraunces
-day-numeral beside a tall taper in the hero. Guard it — nothing else may
+The candle countdown: wax height = fraction of billing cycle remaining, and
+the giant Fraunces day-numeral beside a tall taper in the hero. The hero and
+desktop-stage candle always burn: a calm, smaller flame when the charge is
+far off, a taller, quicker one with a wider halo within 3 days. Ledger rows
+stay unlit until 3 days out, so ember in the list still means urgency. The
+burning candle has a melt pool, a wax run with a bead that slides now and
+then, and a glowing wick tip; flame motion layers sway and flicker on
+unrelated durations so it never visibly loops. Guard it — nothing else may
 compete for "the memorable thing."
 
 ## Feel (serotonin layer)
