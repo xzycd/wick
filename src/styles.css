@@ -3,24 +3,23 @@
    ———————————————————————————————————————————————— */
 
 :root {
-  --base: #f5eee1;
-  --surface: #efe6d4;
-  --surface-deep: #e9dfc9;
-  --ink: #2a2118;
-  /* #726552 clears WCAG AA (4.9:1 on base, 4.6:1 on surface) for the 11–14px
-     caption/label text this drives; the old #8a7a66 was only 3.6:1. Same hue. */
-  --muted: #726552;
-  --hairline: color-mix(in oklab, #2a2118 14%, transparent);
-  --ember: #c9631f;
-  --ember-soft: color-mix(in oklab, #c9631f 14%, transparent);
-  --oxide: #a03a2a;
-  --wax: #f9f3e6;
-  --wax-edge: #d8cbb2;
-  --seal-sand: #e3d3b4;
-  --seal-clay: #d9b99c;
-  --seal-umber: #c7a284;
-  --seal-bone: #ece1cc;
-  --shadow: 0 18px 40px -18px color-mix(in oklab, #2a2118 45%, transparent);
+  --base: #f6f5f2;
+  --surface: #eeede9;
+  --surface-deep: #e5e3de;
+  --ink: #16171a;
+  /* muted clears WCAG AA on base and surface for the 11–14px captions it drives */
+  --muted: #66655f;
+  --hairline: color-mix(in oklab, #16171a 12%, transparent);
+  --ember: #b85419;
+  --ember-soft: color-mix(in oklab, #b85419 11%, transparent);
+  --oxide: #a63a2a;
+  --wax: #fffdf8;
+  --wax-edge: #dad6cd;
+  --seal-sand: #e6e1d6;
+  --seal-clay: #e6d8cb;
+  --seal-umber: #d9d2c8;
+  --seal-bone: #ecebe6;
+  --shadow: 0 18px 40px -18px color-mix(in oklab, #16171a 35%, transparent);
   --ease: cubic-bezier(0.32, 0.72, 0.28, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --radius-field: 14px;
@@ -28,23 +27,24 @@
   color-scheme: light;
 }
 
+/* Night: a neutral charcoal room, so the flame is the only warm thing in it. */
 [data-theme='dark'] {
-  --base: #191410;
-  --surface: #221b15;
-  --surface-deep: #2a221a;
-  --ink: #f0e6d3;
-  --muted: #9c8c77;
-  --hairline: color-mix(in oklab, #f0e6d3 16%, transparent);
-  --ember: #e6873b;
-  --ember-soft: color-mix(in oklab, #e6873b 18%, transparent);
-  --oxide: #d4604b;
-  --wax: #efe3ca;
-  --wax-edge: #4a3d2e;
-  --seal-sand: #4e4028;
-  --seal-clay: #55392a;
-  --seal-umber: #5e4632;
-  --seal-bone: #3c332a;
-  --shadow: 0 18px 44px -16px rgb(0 0 0 / 0.6);
+  --base: #0d0e11;
+  --surface: #15171b;
+  --surface-deep: #1c1e23;
+  --ink: #ece8e1;
+  --muted: #8e8b85;
+  --hairline: color-mix(in oklab, #ece8e1 12%, transparent);
+  --ember: #e8893d;
+  --ember-soft: color-mix(in oklab, #e8893d 15%, transparent);
+  --oxide: #e06a52;
+  --wax: #eee7da;
+  --wax-edge: #34363c;
+  --seal-sand: #23252a;
+  --seal-clay: #2b2522;
+  --seal-umber: #26272c;
+  --seal-bone: #1f2125;
+  --shadow: 0 18px 44px -16px rgb(0 0 0 / 0.7);
   color-scheme: dark;
 }
 
@@ -114,14 +114,7 @@ body::after {
 }
 
 .wordmark-ember {
-  display: inline-block;
   color: var(--ember);
-  animation: coal 4.2s ease-in-out infinite;
-}
-
-@keyframes coal {
-  0%, 100% { text-shadow: 0 0 0 transparent; }
-  50% { text-shadow: 0 0 10px color-mix(in oklab, var(--ember) 70%, transparent); }
 }
 
 /* ——— top bar ——— */
@@ -290,7 +283,7 @@ body::after {
 
 .row--on {
   background: var(--surface);
-  box-shadow: inset 2px 0 0 var(--ember);
+  box-shadow: inset 2px 0 0 color-mix(in oklab, var(--ink) 40%, transparent);
 }
 
 @keyframes row-in {
@@ -373,7 +366,7 @@ body::after {
 }
 
 [data-theme='dark'] .candle-sheen {
-  fill: color-mix(in oklab, #fff8e8 38%, transparent);
+  fill: color-mix(in oklab, #fffaf0 38%, transparent);
 }
 
 .candle-wick {
@@ -403,9 +396,10 @@ body::after {
 .fire-stop-base { stop-color: #b4541a; }
 .fire-stop-mid { stop-color: var(--ember); }
 .fire-stop-tip { stop-color: #f6c27a; }
-.halo-stop-in { stop-color: var(--ember); stop-opacity: 0.3; }
-.halo-stop-out { stop-color: var(--ember); stop-opacity: 0; }
-[data-theme='dark'] .halo-stop-in { stop-opacity: 0.42; }
+.halo-stop-in { stop-color: #f3a95c; stop-opacity: 0.32; }
+.halo-stop-out { stop-color: #f3a95c; stop-opacity: 0; }
+[data-theme='dark'] .halo-stop-in { stop-color: var(--ember); stop-opacity: 0.42; }
+[data-theme='dark'] .halo-stop-out { stop-color: var(--ember); }
 
 .flame-glow {
   fill: var(--ember);
@@ -467,12 +461,22 @@ body::after {
   animation-duration: 2.4s;
 }
 
-.candle--low .candle-halo {
-  opacity: 0.7;
+.candle--low .halo-stop-in {
+  stop-opacity: 0.2;
+}
+
+[data-theme='dark'] .candle--low .halo-stop-in {
+  stop-opacity: 0.28;
 }
 
 .candle-pool {
-  animation: halo 2.9s ease-in-out infinite;
+  animation: pool 2.9s ease-in-out infinite;
+}
+
+@keyframes pool {
+  0%, 100% { opacity: 0.55; }
+  45% { opacity: 0.38; }
+  70% { opacity: 0.5; }
 }
 
 .candle-bead {
@@ -897,7 +901,7 @@ body::after {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: color-mix(in oklab, #1a120a 45%, transparent);
+  background: color-mix(in oklab, #08090b 55%, transparent);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -1501,7 +1505,7 @@ textarea {
   .app--split {
     display: grid;
     grid-template-columns: minmax(360px, 420px) 1fr;
-    max-width: 1280px;
+    max-width: none;
     height: 100dvh;
     min-height: 0;
   }
@@ -1558,9 +1562,6 @@ textarea {
 
   .pane--stage {
     position: relative;
-    background:
-      radial-gradient(60% 55% at 70% 38%, color-mix(in oklab, var(--ember) 9%, transparent), transparent 70%),
-      var(--base);
   }
 
   .pane--stage .screen {
@@ -1634,6 +1635,11 @@ textarea {
   .toast {
     bottom: 32px;
   }
+
+  /* centre the toast over the stage, clear of the ledger's add button */
+  .app--split .toast {
+    left: calc(420px + (100vw - 420px) / 2);
+  }
 }
 
 @keyframes dialog-in {
@@ -1657,8 +1663,7 @@ textarea {
   .flame-core,
   .candle-halo,
   .candle-pool,
-  .wick-ember,
-  .wordmark-ember {
+  .wick-ember {
     animation: none !important;
   }
 

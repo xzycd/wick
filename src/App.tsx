@@ -80,7 +80,7 @@ export default function App() {
     // Match the browser chrome (status bar / address bar) to the active theme,
     // even when the in-app choice overrides the system preference.
     const meta = document.querySelector('meta[name="theme-color"]')
-    meta?.setAttribute('content', resolvedTheme === 'dark' ? '#191410' : '#f5eee1')
+    meta?.setAttribute('content', resolvedTheme === 'dark' ? '#0d0e11' : '#f6f5f2')
   }, [resolvedTheme])
 
   // Refresh the day when the app regains focus, so a mantel left open past
@@ -156,7 +156,7 @@ export default function App() {
     }
     setCharges((prev) => prev.filter((c) => c.id !== id))
     setReclaimed((prev) => [...prev, record])
-    setView({ name: 'home' })
+    setView((v) => (v.name === 'detail' && v.id === id ? { name: 'home' } : v))
     const per = gone.cadence === 'once' ? '' : ` ${cadencePerYear[gone.cadence]}`
     showToast(`Snuffed. That's ${money(gone.amountCents)}${per} back in your pocket.`, () => {
       setCharges((prev) => (prev.some((c) => c.id === gone.id) ? prev : [...prev, gone]))
@@ -252,7 +252,12 @@ export default function App() {
           e.preventDefault()
           search.focus()
         }
-      } else if (wide && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'j' || e.key === 'k')) {
+      } else if (
+        wide &&
+        (document.activeElement === document.body ||
+          (e.target instanceof Element && e.target.closest('.pane--list'))) &&
+        (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'j' || e.key === 'k')
+      ) {
         const rows = [...document.querySelectorAll<HTMLButtonElement>('.pane--list .row')]
         if (rows.length === 0) return
         e.preventDefault()
